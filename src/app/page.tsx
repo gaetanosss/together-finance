@@ -5,8 +5,8 @@ import { Phone, CheckCircle2, Star, ChevronRight, ArrowRight } from "lucide-reac
 import { motion } from "framer-motion";
 
 const BRAND = { name: "Together Finance", primary: "#0073C2", dark: "#0B0B0C" };
-const PRIVACY_URL = "/legal/privacy.pdf";
-const CREDIT_GUIDE_URL = "/legal/credit-guide.pdf";
+const PRIVACY_URL = "/legal/Together Finance - Privacy Consent Template.pdf";
+const CREDIT_GUIDE_URL = "/legal/Together Finance - Credit Guide & Quote Template.pdf";
 
 const LOGO_DATA_URL = "/images/logoS.png"; 
 const HERO_IMAGE_URL = "/images/car.png";
@@ -117,31 +117,109 @@ function LeadStrip() {
   );
 }
 
+// --- dentro page.tsx ---
+
 function LeadForm() {
   const [form, setForm] = useState({ name: "", phone: "", email: "", type: "Car Finance", amount: 30000 });
+  const [loading, setLoading] = useState(false);
+  const [showThanks, setShowThanks] = useState(false);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (loading) return;
+    setLoading(true);
+
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+
+      if (!res.ok) throw new Error("Send failed");
+
+      // Successo: pulisco e mostro overlay
+      setForm({ name: "", phone: "", email: "", type: "Car Finance", amount: 30000 });
+      setShowThanks(true);
+    } catch (err) {
+      alert("C'è stato un problema nell'invio. Riprova tra poco.");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
-    <form onSubmit={(e) => e.preventDefault()} className="bg-white text-black rounded-3xl p-6 sm:p-8 shadow-xl">
-      <h3 className="text-xl font-bold">Start here</h3>
-      <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <Input label="Full name" value={form.name} onChange={(v)=>setForm(f => ({ ...f, name: v }))} />
-        <Input label="Phone" value={form.phone} onChange={(v)=>setForm(f => ({ ...f, phone: v }))} />
-        <Input label="Email" type="email" value={form.email} onChange={(v)=>setForm(f => ({ ...f, email: v }))} />
-        <Select label="Finance type" value={form.type} onChange={(v)=>setForm(f => ({ ...f, type: v }))} options={["Car Finance","Business Finance","Personal Loan","Equipment"]} />
-        <div className="sm:col-span-2">
-          <label className="text-sm font-medium">Amount</label>
-          <div className="mt-2 flex items-center gap-3">
-            <input type="range" min={5000} max={150000} step={1000} value={form.amount} onChange={(e)=>setForm(f => ({ ...f, amount: +(e.target as HTMLInputElement).value }))} className="w-full"/>
-            <span className="text-sm tabular-nums">${form.amount.toLocaleString()}</span>
+    <>
+      <form onSubmit={handleSubmit} className="bg-white text-black rounded-3xl p-6 sm:p-8 shadow-xl">
+        <h3 className="text-xl font-bold">Start here</h3>
+        <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <Input label="Full name" value={form.name} onChange={(v)=>setForm(f => ({ ...f, name: v }))} />
+          <Input label="Phone" value={form.phone} onChange={(v)=>setForm(f => ({ ...f, phone: v }))} />
+          <Input label="Email" type="email" value={form.email} onChange={(v)=>setForm(f => ({ ...f, email: v }))} />
+          <Select label="Finance type" value={form.type} onChange={(v)=>setForm(f => ({ ...f, type: v }))} options={["Car Finance","Business Finance","Personal Loan","Equipment"]} />
+          <div className="sm:col-span-2">
+            <label className="text-sm font-medium">Amount</label>
+            <div className="mt-2 flex items-center gap-3">
+              <input
+                type="range"
+                min={5000}
+                max={150000}
+                step={1000}
+                value={form.amount}
+                onChange={(e)=>setForm(f => ({ ...f, amount: +(e.target as HTMLInputElement).value }))}
+                className="w-full"
+              />
+              <span className="text-sm tabular-nums">${form.amount.toLocaleString()}</span>
+            </div>
           </div>
         </div>
-      </div>
-      <button className="mt-6 w-full bg-black text-white py-3 rounded-xl font-semibold flex items-center justify-center gap-2 hover:opacity-90">Get my pre‑approval <ArrowRight className="w-4 h-4" /></button>
-      {/* NEW LINE BELOW THE BUTTON */}
-      <p className="mt-3 text-xs text-black/70">Get your <a href={CREDIT_GUIDE_URL} className="underline">Credit Guide</a> and e‑sign the <a href={PRIVACY_URL} className="underline">Privacy Consent</a>.</p>
-      <p className="mt-3 text-xs text-black/60">By submitting, you agree to be contacted by Together Finance. No credit impact to check eligibility.</p>
-    </form>
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="mt-6 w-full bg-black text-white py-3 rounded-xl font-semibold flex items-center justify-center gap-2 hover:opacity-90 disabled:opacity-60"
+        >
+          {loading ? "Sending..." : "Get Approved"} <ArrowRight className="w-4 h-4" />
+        </button>
+
+        <p className="mt-3 text-xs text-black/70">
+          Get your <a href={CREDIT_GUIDE_URL} className="underline">Credit Guide</a> and e-sign the <a href={PRIVACY_URL} className="underline">Privacy Consent</a>.
+        </p>
+        <p className="mt-3 text-xs text-black/60">By submitting, you agree to be contacted by Together Finance. No credit impact to check eligibility.</p>
+      </form>
+
+      {showThanks && <ThankYouOverlay onClose={() => setShowThanks(false)} />}
+    </>
   );
 }
+
+function ThankYouOverlay({ onClose }: { onClose: () => void }) {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black">
+      <div className="text-center px-6">
+        <CheckCircle2 className="w-20 h-20 text-green-500 mx-auto mb-4" />
+        <h2 className="text-2xl sm:text-3xl font-extrabold mb-2">Thank you for contacting us!</h2>
+        <p className="text-white/70 max-w-md mx-auto">
+          We will contact you as soon as possible to finalize your financing request.
+        </p>
+        <button
+          onClick={onClose}
+          className="mt-6 bg-white text-black px-6 py-2 rounded-xl font-semibold"
+        >
+          Torna al sito
+        </button>
+      </div>
+    </div>
+  );
+}
+
 
 function Input({ label, type = "text", value, onChange }:{label:string; type?:string; value:string; onChange:(v:string)=>void;}) {
   return (
