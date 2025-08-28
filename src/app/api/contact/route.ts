@@ -15,7 +15,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const subject = "Nuovo contatto dal sito Together Finance";
+    const subject = "Nuovo contatto dal sito Together-Finance";
     const text = `
 Nome: ${data.name}
 Telefono: ${data.phone}
