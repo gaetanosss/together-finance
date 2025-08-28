@@ -301,7 +301,7 @@ function ThankYouOverlay({ onClose }: { onClose: () => void }) {
           onClick={onClose}
           className="mt-6 bg-white text-black px-6 py-2 rounded-xl font-semibold"
         >
-          Torna al sito
+          Back to Homepage
         </button>
       </div>
     </div>
