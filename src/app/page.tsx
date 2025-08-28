@@ -117,15 +117,52 @@ function LeadStrip() {
   );
 }
 
-// --- dentro page.tsx ---
+
 
 function LeadForm() {
-  const [form, setForm] = useState({ name: "", phone: "", email: "", type: "Car Finance", amount: 30000 });
+  const [form, setForm] = useState({ 
+    name: "", 
+    phone: "", 
+    email: "", 
+    type: "Car Finance", 
+    amount: 30000 
+  });
   const [loading, setLoading] = useState(false);
   const [showThanks, setShowThanks] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // Funzione di validazione
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {};
+
+    if (!form.name.trim()) {
+      newErrors.name = "The name is required";
+    }
+
+    if (!form.phone.trim()) {
+      newErrors.phone = "The telephone is required";
+    } else if (!/^[\d\s\+\-\(\)]{10,}$/.test(form.phone)) {
+      newErrors.phone = "Please enter a valid phone number";
+    }
+
+    if (!form.email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+      newErrors.email = "Please enter a valid email address";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    
+    // Validazione prima di inviare
+    if (!validateForm()) {
+      return;
+    }
+
     if (loading) return;
     setLoading(true);
 
@@ -141,8 +178,9 @@ function LeadForm() {
       // Successo: pulisco e mostro overlay
       setForm({ name: "", phone: "", email: "", type: "Car Finance", amount: 30000 });
       setShowThanks(true);
+      setErrors({}); // Pulisco gli errori
     } catch (err) {
-      alert("C'è stato un problema nell'invio. Riprova tra poco.");
+      alert("There was a problem sending. Please try again shortly.");
       console.error(err);
     } finally {
       setLoading(false);
@@ -154,10 +192,31 @@ function LeadForm() {
       <form onSubmit={handleSubmit} className="bg-white text-black rounded-3xl p-6 sm:p-8 shadow-xl">
         <h3 className="text-xl font-bold">Start here</h3>
         <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <Input label="Full name" value={form.name} onChange={(v)=>setForm(f => ({ ...f, name: v }))} />
-          <Input label="Phone" value={form.phone} onChange={(v)=>setForm(f => ({ ...f, phone: v }))} />
-          <Input label="Email" type="email" value={form.email} onChange={(v)=>setForm(f => ({ ...f, email: v }))} />
-          <Select label="Finance type" value={form.type} onChange={(v)=>setForm(f => ({ ...f, type: v }))} options={["Car Finance","Business Finance","Personal Loan","Equipment"]} />
+          <Input 
+            label="Full name" 
+            value={form.name} 
+            onChange={(v)=>setForm(f => ({ ...f, name: v }))} 
+            error={errors.name}
+          />
+          <Input 
+            label="Phone" 
+            value={form.phone} 
+            onChange={(v)=>setForm(f => ({ ...f, phone: v }))} 
+            error={errors.phone}
+          />
+          <Input 
+            label="Email" 
+            type="email" 
+            value={form.email} 
+            onChange={(v)=>setForm(f => ({ ...f, email: v }))} 
+            error={errors.email}
+          />
+          <Select 
+            label="Finance type" 
+            value={form.type} 
+            onChange={(v)=>setForm(f => ({ ...f, type: v }))} 
+            options={["Car Finance","Business Finance","Personal Loan","Equipment"]} 
+          />
           <div className="sm:col-span-2">
             <label className="text-sm font-medium">Amount</label>
             <div className="mt-2 flex items-center gap-3">
@@ -174,6 +233,13 @@ function LeadForm() {
             </div>
           </div>
         </div>
+
+        {/* Mostra errori generali se presenti */}
+        {Object.keys(errors).length > 0 && (
+          <div className="mt-4 p-3 bg-red-50 text-red-700 rounded-xl text-sm">
+            Please complete all required fields correctly.
+          </div>
+        )}
 
         <button
           type="submit"
@@ -193,6 +259,28 @@ function LeadForm() {
     </>
   );
 }
+
+// Aggiorna il componente Input per supportare gli errori
+function Input({ label, type = "text", value, onChange, error }:{label:string; type?:string; value:string; onChange:(v:string)=>void; error?: string;}) {
+  return (
+    <div>
+      <label className="text-sm font-medium">{label}</label>
+      <input 
+        type={type} 
+        value={value} 
+        onChange={(e)=>onChange((e.target as HTMLInputElement).value)} 
+        className={`mt-2 w-full rounded-xl border px-3 py-2 bg-white focus:outline-none focus:ring-2 ${
+          error ? "border-red-300 focus:ring-red-200" : "border-black/10 focus:ring-black/20"
+        }`} 
+      />
+      {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
+    </div>
+  );
+} 
+
+// --- dentro page.tsx ---
+
+
 
 function ThankYouOverlay({ onClose }: { onClose: () => void }) {
   useEffect(() => {
@@ -220,15 +308,6 @@ function ThankYouOverlay({ onClose }: { onClose: () => void }) {
   );
 }
 
-
-function Input({ label, type = "text", value, onChange }:{label:string; type?:string; value:string; onChange:(v:string)=>void;}) {
-  return (
-    <div>
-      <label className="text-sm font-medium">{label}</label>
-      <input type={type} value={value} onChange={(e)=>onChange((e.target as HTMLInputElement).value)} className="mt-2 w-full rounded-xl border border-black/10 px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-black/20" />
-    </div>
-  );
-}
 
 function Select({ label, value, onChange, options }:{label:string; value:string; onChange:(v:string)=>void; options:string[];}) {
   return (
