@@ -15,7 +15,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const subject = "Nuovo contatto dal sito Together-Finance";
+    const subject = "Nuovo contatto dal sito TogetherFinance";
     const text = `
 Nome: ${data.name}
 Telefono: ${data.phone}
@@ -24,15 +24,13 @@ Tipo: ${data.type}
 Importo: ${data.amount}
     `.trim();
 
-    // await resend.emails.send({
-    //   from: "Together Finance <bella@togetherfinance.com.au>",
-    //   to: process.env.MAIL_TO || "bella@togetherfinance.com.au",
-    //   replyTo: data.email,
-    //   subject,
-    //   text,
-    // });
-
-    console.log("MAIL SENT", {data });
+    await resend.emails.send({
+      from: "Together Finance <bella@togetherfinance.com.au>",
+      to: process.env.MAIL_TO || "bella@togetherfinance.com.au",
+      replyTo: data.email,
+      subject,
+      text,
+    });
 
     return NextResponse.json({ ok: true });
   } catch (err) {
