@@ -59,30 +59,80 @@ function Header() {
   );
 }
 
-function Hero() {
+
+  function Hero() {
   return (
     <section className="relative overflow-hidden">
-      <div className="absolute inset-0 opacity-20" style={{ background: `radial-gradient(1000px 400px at 10% 10%, ${BRAND.primary}55, transparent 60%), radial-gradient(800px 300px at 90% 30%, ${BRAND.primary}25, transparent 60%)` }} />
+      <div
+        className="absolute inset-0 opacity-20"
+        style={{
+          background: `radial-gradient(1000px 400px at 10% 10%, ${BRAND.primary}55, transparent 60%), radial-gradient(800px 300px at 90% 30%, ${BRAND.primary}25, transparent 60%)`,
+        }}
+      />
+
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-10 py-14 lg:py-24 items-center">
+        {/* Testo */}
         <div>
-          <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-[1.05] tracking-tight">Fast Approvals. <span style={{ color: BRAND.primary }}>Real People.</span><br />Big Dreams.</motion.h1>
-          <p className="mt-5 text-lg text-white/80 max-w-xl">Car, business and personal finance made simple. Speak to a real consultant and get a decision fast — without the runaround.</p>
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-[1.05] tracking-tight"
+          >
+            Fast Approvals.{" "}
+            <span style={{ color: BRAND.primary }}>Real People.</span>
+            <br />
+            Big Dreams.
+          </motion.h1>
+
+          <p className="mt-5 text-lg text-white/80 max-w-xl">
+            Car, business and personal finance made simple. Speak to a real
+            consultant and get a decision fast — without the runaround.
+          </p>
+
           <div className="mt-8 flex flex-wrap gap-3">
-            <a href="#lead" className="inline-flex items-center gap-2 bg-white text-black px-6 py-3 rounded-2xl font-semibold shadow hover:opacity-90">Get Pre‑Approved <ChevronRight className="w-4 h-4" /></a>
-            <a href="tel:+61435218466" className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl font-semibold border border-white/20"><Phone className="w-4 h-4" /> Call 0435 218 466</a>
+            <a
+              href="#lead"
+              className="inline-flex items-center gap-2 bg-white text-black px-6 py-3 rounded-2xl font-semibold shadow hover:opacity-90"
+            >
+              Get Pre-Approved <ChevronRight className="w-4 h-4" />
+            </a>
+            <a
+              href="tel:+61435218466"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl font-semibold border border-white/20"
+            >
+              <Phone className="w-4 h-4" /> Call 0435 218 466
+            </a>
           </div>
+
           <div className="mt-6 flex items-center gap-4 text-white/70 text-sm">
-            <div className="flex items-center gap-1">{Array.from({ length: 5 }).map((_, i) => (<Star key={i} className="w-4 h-4 fill-current" />))}</div>
+            <div className="flex items-center gap-1">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Star key={i} className="w-4 h-4 fill-current" />
+              ))}
+            </div>
             <span>4.9/5 average from 250+ reviews</span>
           </div>
         </div>
-        <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.6, delay: 0.15 }} className="relative rounded-3xl overflow-hidden shadow-2xl border border-white/10 min-h-[360px]">
-          <img src={HERO_IMAGE_URL} alt="Hero visual" className="w-full h-full object-contain bg-black" />
+
+        {/* Immagine */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.98 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.6, delay: 0.15 }}
+          className="relative rounded-3xl overflow-hidden shadow-2xl border border-white/10 bg-black flex items-center justify-center w-full h-[40vh] sm:h-[50vh] lg:h-[80vh] aspect-[16/9]"
+        >
+          <img
+            src={HERO_IMAGE_URL}
+            alt="Hero visual"
+            className="w-full h-full object-contain p-4"
+          />
         </motion.div>
       </div>
     </section>
   );
 }
+
 
 function TrustBar() {
   return (
