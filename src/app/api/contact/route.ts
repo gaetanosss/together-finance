@@ -25,7 +25,7 @@ Importo: ${data.amount}
     `.trim();
 
     await resend.emails.send({
-      from: "Together Finance <bella@togetherfinance.com.au>",
+      from: process.env.FROM_EMAIL || "Together Finance <onboarding@resend.dev>",
       to: process.env.MAIL_TO || "bella@togetherfinance.com.au",
       replyTo: data.email,
       subject,
