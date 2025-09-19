@@ -44,15 +44,37 @@ function Header() {
     <header className="sticky top-0 z-40 backdrop-blur supports-[backdrop-filter]:bg-black/70 bg-black/80 border-b border-white/10">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <img src={LOGO_DATA_URL} alt="Together Finance" className="h-10 w-auto rounded" />
+          <img
+            src={LOGO_DATA_URL}
+            alt="Together Finance"
+            className="h-10 w-auto rounded"
+          />
         </div>
         <div className="hidden md:flex items-center gap-8 text-sm text-white/80">
-          <a href="#proof" className="hover:text-white">Results</a>
-          <a href="#process" className="hover:text-white">How it works</a>
-          <a href="#calculator" className="hover:text-white">Calculator</a>
-          <a href="#faq" className="hover:text-white">FAQ</a>
-          <a href="tel:+61435218466" className="inline-flex items-center gap-2 font-semibold text-white"><Phone className="w-4 h-4" /> 0435 218 466</a>
-          <a href="#lead" className="inline-flex items-center gap-2 bg-white text-black px-4 py-2 rounded-xl font-semibold">Get Pre‑Approved <ArrowRight className="w-4 h-4" /></a>
+          <a href="#proof" className="hover:text-white">
+            Results
+          </a>
+          <a href="#process" className="hover:text-white">
+            How it works
+          </a>
+          <a href="#calculator" className="hover:text-white">
+            Calculator
+          </a>
+          <a href="#faq" className="hover:text-white">
+            FAQ
+          </a>
+          <a
+            href="tel:+61435218466"
+            className="inline-flex items-center gap-2 font-semibold text-white"
+          >
+            <Phone className="w-4 h-4" /> 0435 218 466
+          </a>
+          <a
+            href="#lead"
+            className="inline-flex items-center gap-2 bg-white text-black px-4 py-2 rounded-xl font-semibold"
+          >
+            Get Pre-Approved <ArrowRight className="w-4 h-4" />
+          </a>
         </div>
       </div>
     </header>
@@ -153,11 +175,26 @@ function LeadStrip() {
     <section id="lead" className="py-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-10 items-center">
         <div>
-          <h2 className="text-3xl sm:text-4xl font-extrabold">Get your free pre‑approval in minutes</h2>
-          <p className="mt-3 text-white/70 max-w-xl">Tell us what you need and one of our consultants (a real human!) will call you to confirm options.</p>
+          <h2 className="text-3xl sm:text-4xl font-extrabold">
+            Get your free pre-approval in minutes
+          </h2>
+          <p className="mt-3 text-white/70 max-w-xl">
+            Tell us what you need and one of our consultants (a real human!)
+            will call you to confirm options.
+          </p>
           <ul className="mt-6 space-y-3 text-white/80">
-            {["No impact on credit score to check eligibility","We compare multiple lenders for the sharpest rate","Same‑day approvals available"].map((t) => (
-              <li key={t} className="flex items-center gap-3"><CheckCircle2 className="w-5 h-5 text-[var(--brand)]" style={{"--brand": BRAND.primary} as React.CSSProperties} /><span>{t}</span></li>
+            {[
+              "No impact on credit score to check eligibility",
+              "We compare multiple lenders for the sharpest rate",
+              "Same-day approvals available",
+            ].map((t) => (
+              <li key={t} className="flex items-center gap-3">
+                <CheckCircle2
+                  className="w-5 h-5 text-[var(--brand)]"
+                  style={{ "--brand": BRAND.primary } as React.CSSProperties}
+                />
+                <span>{t}</span>
+              </li>
             ))}
           </ul>
         </div>
@@ -170,49 +207,42 @@ function LeadStrip() {
 
 
 function LeadForm() {
-  const [form, setForm] = useState({ 
-    name: "", 
-    phone: "", 
-    email: "", 
-    type: "Car Finance", 
-    amount: 30000 
+  const [form, setForm] = useState({
+    name: "",
+    phone: "",
+    email: "",
+    type: "Car Finance",
+    amount: "30000", // 👈 stringa
   });
   const [loading, setLoading] = useState(false);
   const [showThanks, setShowThanks] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  // Funzione di validazione
+  // validazione
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
-
-    if (!form.name.trim()) {
-      newErrors.name = "The name is required";
-    }
-
-    if (!form.phone.trim()) {
+    if (!form.name.trim()) newErrors.name = "The name is required";
+    if (!form.phone.trim())
       newErrors.phone = "The telephone is required";
-    } else if (!/^[\d\s\+\-\(\)]{10,}$/.test(form.phone)) {
+    else if (!/^[\d\s\+\-\(\)]{10,}$/.test(form.phone))
       newErrors.phone = "Please enter a valid phone number";
-    }
-
-    if (!form.email.trim()) {
-      newErrors.email = "Email is required";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+    if (!form.email.trim()) newErrors.email = "Email is required";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email))
       newErrors.email = "Please enter a valid email address";
-    }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    
-    // Validazione prima di inviare
-    if (!validateForm()) {
-      return;
-    }
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setForm((f) => ({ ...f, [name]: value }));
+  };
 
+   async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!validateForm()) return;
     if (loading) return;
     setLoading(true);
 
@@ -220,15 +250,22 @@ function LeadForm() {
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({
+          ...form,
+          amount: Number(form.amount), // 👈 conversione qui
+        }),
       });
-
-      if (!res.ok) throw new Error("Send failed");
-
-      // Successo: pulisco e mostro overlay
-      setForm({ name: "", phone: "", email: "", type: "Car Finance", amount: 30000 });
+      const payload = await res.json();
+      if (!res.ok) throw new Error(payload?.error || "Send failed");
+      setForm({
+        name: "",
+        phone: "",
+        email: "",
+        type: "Car Finance",
+        amount: "30000",
+      });
       setShowThanks(true);
-      setErrors({}); // Pulisco gli errori
+      setErrors({});
     } catch (err) {
       alert("There was a problem sending. Please try again shortly.");
       console.error(err);
@@ -237,100 +274,169 @@ function LeadForm() {
     }
   }
 
+
   return (
     <>
-      <form onSubmit={handleSubmit} className="bg-white text-black rounded-3xl p-6 sm:p-8 shadow-xl">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white text-black rounded-3xl p-6 sm:p-8 shadow-xl"
+      >
         <h3 className="text-xl font-bold">Start here</h3>
         <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <Input 
-            label="Full name" 
-            value={form.name} 
-            onChange={(v)=>setForm(f => ({ ...f, name: v }))} 
+          <Input
+            label="Full name"
+            name="name"
+            value={form.name}
+            onChange={handleChange}
             error={errors.name}
           />
-          <Input 
-            label="Phone" 
-            value={form.phone} 
-            onChange={(v)=>setForm(f => ({ ...f, phone: v }))} 
+          <Input
+            label="Phone"
+            name="phone"
+            value={form.phone}
+            onChange={handleChange}
             error={errors.phone}
           />
-          <Input 
-            label="Email" 
-            type="email" 
-            value={form.email} 
-            onChange={(v)=>setForm(f => ({ ...f, email: v }))} 
+          <Input
+            label="Email"
+            type="email"
+            name="email"
+            value={form.email}
+            onChange={handleChange}
             error={errors.email}
           />
-          <Select 
-            label="Finance type" 
-            value={form.type} 
-            onChange={(v)=>setForm(f => ({ ...f, type: v }))} 
-            options={["Car Finance","Business Finance","Personal Loan","Equipment"]} 
+          <Select
+            label="Finance type"
+            name="type"
+            value={form.type}
+            onChange={handleChange}
+            options={[
+              "Car Finance",
+              "Business Finance",
+              "Personal Loan",
+              "Equipment",
+            ]}
           />
           <div className="sm:col-span-2">
             <label className="text-sm font-medium">Amount</label>
             <div className="mt-2 flex items-center gap-3">
               <input
                 type="range"
+                name="amount"
                 min={5000}
                 max={150000}
                 step={1000}
                 value={form.amount}
-                onChange={(e)=>setForm(f => ({ ...f, amount: +(e.target as HTMLInputElement).value }))}
+                onChange={handleChange}
                 className="w-full"
               />
-              <span className="text-sm tabular-nums">${form.amount.toLocaleString()}</span>
+              <span className="text-sm tabular-nums">
+                ${Number(form.amount).toLocaleString()}
+              </span>
             </div>
           </div>
         </div>
-
-        {/* Mostra errori generali se presenti */}
         {Object.keys(errors).length > 0 && (
           <div className="mt-4 p-3 bg-red-50 text-red-700 rounded-xl text-sm">
             Please complete all required fields correctly.
           </div>
         )}
-
         <button
           type="submit"
           disabled={loading}
           className="mt-6 w-full bg-black text-white py-3 rounded-xl font-semibold flex items-center justify-center gap-2 hover:opacity-90 disabled:opacity-60"
         >
-          {loading ? "Sending..." : "Get Approved"} <ArrowRight className="w-4 h-4" />
+          {loading ? "Sending..." : "Get Approved"}{" "}
+          <ArrowRight className="w-4 h-4" />
         </button>
-
         <p className="mt-3 text-xs text-black/70">
-          Get your <a href={CREDIT_GUIDE_URL} className="underline">Credit Guide</a> and e-sign the <a href={PRIVACY_URL} className="underline">Privacy Consent</a>.
+          Get your{" "}
+          <a href={CREDIT_GUIDE_URL} className="underline">
+            Credit Guide
+          </a>{" "}
+          and e-sign the{" "}
+          <a href={PRIVACY_URL} className="underline">
+            Privacy Consent
+          </a>
+          .
         </p>
-        <p className="mt-3 text-xs text-black/60">By submitting, you agree to be contacted by Together Finance. No credit impact to check eligibility.</p>
+        <p className="mt-3 text-xs text-black/60">
+          By submitting, you agree to be contacted by Together Finance. No
+          credit impact to check eligibility.
+        </p>
       </form>
-
       {showThanks && <ThankYouOverlay onClose={() => setShowThanks(false)} />}
     </>
   );
 }
 
+
 // Aggiorna il componente Input per supportare gli errori
-function Input({ label, type = "text", value, onChange, error }:{label:string; type?:string; value:string; onChange:(v:string)=>void; error?: string;}) {
+function Input({
+  label,
+  type = "text",
+  name,
+  value,
+  onChange,
+  error,
+}: {
+  label: string;
+  type?: string;
+  name: string;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  error?: string;
+}) {
   return (
     <div>
       <label className="text-sm font-medium">{label}</label>
-      <input 
-        type={type} 
-        value={value} 
-        onChange={(e)=>onChange((e.target as HTMLInputElement).value)} 
+      <input
+        type={type}
+        name={name}
+        value={value}
+        onChange={onChange}
         className={`mt-2 w-full rounded-xl border px-3 py-2 bg-white focus:outline-none focus:ring-2 ${
-          error ? "border-red-300 focus:ring-red-200" : "border-black/10 focus:ring-black/20"
-        }`} 
+          error
+            ? "border-red-300 focus:ring-red-200"
+            : "border-black/10 focus:ring-black/20"
+        }`}
       />
       {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
     </div>
   );
-} 
+}
 
-// --- dentro page.tsx ---
-
-
+function Select({
+  label,
+  name,
+  value,
+  onChange,
+  options,
+}: {
+  label: string;
+  name: string;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+  options: string[];
+}) {
+  return (
+    <div>
+      <label className="text-sm font-medium">{label}</label>
+      <select
+        name={name}
+        value={value}
+        onChange={onChange}
+        className="mt-2 w-full rounded-xl border border-black/10 px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-black/20"
+      >
+        {options.map((o) => (
+          <option key={o} value={o}>
+            {o}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+}
 
 function ThankYouOverlay({ onClose }: { onClose: () => void }) {
   useEffect(() => {
@@ -343,9 +449,12 @@ function ThankYouOverlay({ onClose }: { onClose: () => void }) {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black">
       <div className="text-center px-6">
         <CheckCircle2 className="w-20 h-20 text-green-500 mx-auto mb-4" />
-        <h2 className="text-2xl sm:text-3xl font-extrabold mb-2">Thank you for contacting us!</h2>
+        <h2 className="text-2xl sm:text-3xl font-extrabold mb-2">
+          Thank you for contacting us!
+        </h2>
         <p className="text-white/70 max-w-md mx-auto">
-          We will contact you as soon as possible to finalize your financing request.
+          We will contact you as soon as possible to finalize your financing
+          request.
         </p>
         <button
           onClick={onClose}
@@ -358,17 +467,8 @@ function ThankYouOverlay({ onClose }: { onClose: () => void }) {
   );
 }
 
+// --- dentro page.tsx ---
 
-function Select({ label, value, onChange, options }:{label:string; value:string; onChange:(v:string)=>void; options:string[];}) {
-  return (
-    <div>
-      <label className="text-sm font-medium">{label}</label>
-      <select value={value} onChange={(e)=>onChange((e.target as HTMLSelectElement).value)} className="mt-2 w-full rounded-xl border border-black/10 px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-black/20">
-        {options.map((o)=> <option key={o} value={o}>{o}</option>)}
-      </select>
-    </div>
-  );
-}
 
 function Proof() {
   const items = [
