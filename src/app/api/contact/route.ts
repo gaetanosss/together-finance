@@ -1,85 +1,68 @@
 // src/app/api/contact/route.ts
 import { NextResponse } from "next/server";
-import { Resend } from "resend";
-
-const RESEND_API_KEY = process.env.RESEND_API_KEY;
-const MAIL_TO = process.env.MAIL_TO;
-const FROM_EMAIL = process.env.FROM_EMAIL || "Together Finance <onboarding@resend.dev>";
-
-if (!RESEND_API_KEY) {
-  console.error("Missing RESEND_API_KEY env var");
-}
-if (!MAIL_TO) {
-  console.error("Missing MAIL_TO env var");
-}
-
-const resend = RESEND_API_KEY ? new Resend(RESEND_API_KEY) : null;
 
 export async function POST(req: Request) {
-  if (!resend) {
-    return NextResponse.json({ ok: false, error: "Mail service not configured" }, { status: 500 });
+  const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
+  const MAIL_TO = process.env.MAIL_TO;
+  const FROM_EMAIL = process.env.FROM_EMAIL;
+
+  if (!SENDGRID_API_KEY || !MAIL_TO || !FROM_EMAIL) {
+    return NextResponse.json({ ok: false, error: "Missing env vars" }, { status: 500 });
   }
 
   try {
     const data = await req.json();
 
-    // Basic server-side validation
-    if (!data?.name || !data?.phone || !data?.email) {
+    // Controllo base
+    if (!data?.name || !data?.email || !data?.phone) {
       return NextResponse.json({ ok: false, error: "Missing fields" }, { status: 400 });
     }
 
-    const subject = "Nuovo contatto dal sito TogetherFinance";
-    const text = `
-Nome: ${data.name}
-Telefono: ${data.phone}
-Email: ${data.email}
-Tipo: ${data.type ?? ""}
-Importo: ${data.amount ?? ""}
-    `.trim();
-
+    // Corpo del messaggio
     const html = `
-      <div style="font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; color: #111;">
-        <h2 style="color:#0073C2">Nuovo contatto - Together Finance</h2>
-        <p><strong>Nome:</strong> ${escapeHtml(String(data.name))}</p>
-        <p><strong>Telefono:</strong> ${escapeHtml(String(data.phone))}</p>
-        <p><strong>Email:</strong> ${escapeHtml(String(data.email))}</p>
-        <p><strong>Tipo:</strong> ${escapeHtml(String(data.type ?? ""))}</p>
-        <p><strong>Importo:</strong> ${escapeHtml(String(data.amount ?? ""))}</p>
-        <hr/>
-        <p style="font-size:12px;color:#666">Questo messaggio è stato inviato dal form sul sito togetherfinance.com.au</p>
+      <div style="font-family: Arial, sans-serif; color: #111; line-height: 1.5;">
+        <h2>📩 Nuovo contatto dal sito Together Finance</h2>
+        <p><strong>Nome:</strong> ${data.name}</p>
+        <p><strong>Telefono:</strong> ${data.phone}</p>
+        <p><strong>Email:</strong> ${data.email}</p>
+        <p><strong>Tipo:</strong> ${data.type ?? "-"}</p>
+        <p><strong>Importo richiesto:</strong> ${data.amount ?? "-"}</p>
+        <hr />
+        <p style="font-size: 12px; color: #777;">
+          Questo messaggio è stato inviato dal form sul sito togetherfinance.com.au
+        </p>
       </div>
     `;
 
-    const MAIL_TO = process.env.MAIL_TO ?? "";
+    // Invia la mail
+    const response = await fetch("https://api.sendgrid.com/v3/mail/send", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${SENDGRID_API_KEY}`,
+      },
+      body: JSON.stringify({
+        personalizations: [
+          {
+            to: [{ email: MAIL_TO }],
+            subject: "Nuovo contatto dal sito Together Finance",
+          },
+        ],
+        from: { email: FROM_EMAIL, name: "Together Finance" },
+        reply_to: { email: data.email }, // così puoi rispondere direttamente al cliente
+        content: [{ type: "text/html", value: html }],
+      }),
+    });
 
-    if (!MAIL_TO) {
-  throw new Error("MAIL_TO environment variable is not set");
-}
-
-await resend.emails.send({
-  from: FROM_EMAIL,
-  to: MAIL_TO,
-  replyTo: data.email,
-  subject,
-  text,
-  html,
-});
-
-
+    if (!response.ok) {
+      const errText = await response.text();
+      console.error("SENDGRID ERROR:", errText);
+      return NextResponse.json({ ok: false, error: "Failed to send email" }, { status: 500 });
+    }
 
     return NextResponse.json({ ok: true });
   } catch (err) {
-    console.error("MAIL ERROR", err);
-    return NextResponse.json({ ok: false, error: "Mail send failed" }, { status: 500 });
+    console.error("MAIL ERROR:", err);
+    return NextResponse.json({ ok: false, error: "Unexpected error" }, { status: 500 });
   }
-}
-
-// small helper to avoid XSS when injecting into HTML
-function escapeHtml(unsafe: string) {
-  return unsafe
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
 }
