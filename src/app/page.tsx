@@ -251,9 +251,11 @@ function LeadForm() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          ...form,
-          amount: Number(form.amount), // 👈 conversione qui
-        }),
+  ...form,
+  amount: Number(form.amount),
+  page: typeof window !== "undefined" ? window.location.href : ""
+})
+,
       });
       const payload = await res.json();
       if (!res.ok) throw new Error(payload?.error || "Send failed");
